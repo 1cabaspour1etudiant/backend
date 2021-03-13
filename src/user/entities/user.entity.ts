@@ -9,23 +9,32 @@ export class User {
     firstname: string;
 
     @Column()
-    name: string;
+    lastname: string;
+
+    @Column()
+    tel: string;
 
     @Column()
     email: string;
 
     @Column()
-    postalCode: string;
+    password: string;
 
     @Column()
-    street: string;
+    adress: string;
 
     @Column()
     city: string;
 
-    @Column('boolean', { default: false })
-    validated: boolean;
+    @Column()
+    postalCode: string;
+
+    @Column()
+    role: string;
 
     @Column()
     activity: string;
+
+    @Column('boolean', { default: false })
+    validated: boolean;
 }
