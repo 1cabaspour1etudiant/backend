@@ -23,7 +23,7 @@ export class CreateUserDto {
     postalCode: string;
 
     @IsString()
-    status: string;
+    role:string;
 
     @IsString()
     activity: string;
