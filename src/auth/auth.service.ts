@@ -30,7 +30,7 @@ export class AuthService {
         };
 
         return {
-            access_token: await this.jwtService.signAsync(payload)
+            access_token: await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET })
         };
     }
 
