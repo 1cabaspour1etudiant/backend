@@ -1,7 +1,7 @@
+import * as bcrypt from 'bcrypt';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
-import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/entities/user.entity';
 
 
@@ -32,5 +32,17 @@ export class AuthService {
         return {
             access_token: await this.jwtService.signAsync(payload)
         };
+    }
+
+    async verify(token: string) {
+        const decoded = await this.jwtService.verifyAsync(token, { secret: process.env.JWT_SECRET });
+        
+        const user = await this.userService.getUserByEmail(decoded.email);
+
+        if (!user) {
+            throw new ForbiddenException('Unable to get the user from the given token');
+        }
+
+        return user;
     }
 }
