@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
+import { User } from 'src/user/entities/user.entity';
 
 
 @Injectable()
@@ -20,5 +21,16 @@ export class AuthService {
         }
 
         return bcrypt.compare(password, user.password) ? user : null;
+    }
+
+    async login(user: User) {
+        const payload = {
+            email: user.email,
+            sub: user.id
+        };
+
+        return {
+            access_token: await this.jwtService.signAsync(payload)
+        };
     }
 }
