@@ -32,4 +32,8 @@ export class UserService {
 
         return this.userRespository.save(user);
     }
+
+    async getUserByEmail(email: string) {
+        return this.userRespository.findOne({ where: { email } });
+    }
 }
