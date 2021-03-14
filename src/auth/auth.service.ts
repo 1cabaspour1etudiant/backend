@@ -20,7 +20,7 @@ export class AuthService {
             return null;
         }
 
-        return bcrypt.compare(password, user.password) ? user : null;
+        return await bcrypt.compare(password, user.password) ? user : null;
     }
 
     async login(user: User) {
