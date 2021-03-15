@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user-dto';
 import { User } from './entities/user.entity';
 import { hash } from 'bcrypt';
+import { UpdateUserDto } from './dto/update-user-dto';
 
 
 @Injectable()
@@ -35,5 +36,12 @@ export class UserService {
 
     async getUserByEmail(email: string) {
         return this.userRespository.findOne({ where: { email } });
+    }
+
+    async updateUser(user: User, updateUserDto: UpdateUserDto) {
+        if (typeof updateUserDto.email === "string") {
+            updateUserDto.email = updateUserDto.email.toUpperCase();
+        }
+        await this.userRespository.update({ id: user.id }, { ...updateUserDto });
     }
 }

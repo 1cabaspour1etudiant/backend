@@ -19,6 +19,7 @@ export class UserController {
     @UseGuards(AuthGuard('jwt'))
     @Patch('/me')
     async updateUserMeInfos(@GetUser() user: User, @Body() updateUserDto: UpdateUserDto) {
+        await this.userService.updateUser(user, updateUserDto);
         return updateUserDto;
     }
 }
