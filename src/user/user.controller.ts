@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { CreateUserDto } from './dto/create-user-dto';
+import { EmailIsAvailableDto } from './dto/email-is-available-dto';
 import { UpdateUserDto } from './dto/update-user-dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
@@ -10,6 +11,11 @@ import { UserService } from './user.service';
 export class UserController {
 
     constructor(private readonly userService: UserService) {}
+
+    @Get('emailIsAvailable')
+    async emailIsAvailable(@Query() emailIsAvailableDto: EmailIsAvailableDto) {
+        return this.userService.emailIsAvailable(emailIsAvailableDto.email);
+    }
 
     @Post()
     async createUser(@Body() createUserDto: CreateUserDto) {

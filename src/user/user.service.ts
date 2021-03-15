@@ -44,4 +44,9 @@ export class UserService {
         }
         await this.userRespository.update({ id: user.id }, { ...updateUserDto });
     }
+
+    async emailIsAvailable(email: string) {
+        const user = await this.getUserByEmail(email);
+        return user === undefined;
+    }
 }
