@@ -35,7 +35,7 @@ export class UserService {
     }
 
     async getUserByEmail(email: string) {
-        return this.userRespository.findOne({ where: { email } });
+        return this.userRespository.findOne({ where: { email: email.toUpperCase() } });
     }
 
     async updateUser(user: User, updateUserDto: UpdateUserDto) {
