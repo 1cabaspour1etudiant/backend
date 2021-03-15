@@ -1,11 +1,14 @@
-import { Body, Controller, Get, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { CreateUserDto } from './dto/create-user-dto';
 import { EmailIsAvailableDto } from './dto/email-is-available-dto';
 import { UpdateUserDto } from './dto/update-user-dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
+import { diskStorage } from 'multer';
+import * as path from 'path';
 
 @Controller('user')
 export class UserController {
@@ -34,5 +37,24 @@ export class UserController {
     async getUserMeInfos(@GetUser() user: User) {
         const { password, ...userDto } = user;
         return userDto;
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @UseInterceptors(FileInterceptor('file', {
+        storage: diskStorage({
+            filename: (req, file, cb) => {
+                const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+                const ext = `${path.extname(file.originalname)}`;
+                cb(null, `profilePicture-${uniqueSuffix}${ext}`);
+            }
+        })
+    }))
+    @Put('/me/profilePicture')
+    async uploadUserMePictureProfile(
+        @UploadedFile() file: Express.Multer.File,
+        @GetUser() user: User,
+    ) {
+        
+        await this.userService.uploadUserProfilePicture(user, file.path);
     }
 }

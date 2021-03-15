@@ -8,7 +8,7 @@ import { UpdateUserDto } from './dto/update-user-dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { JwtService } from '@nestjs/jwt';
 import { InjectS3, S3 } from 'nestjs-s3';
-import fs from 'fs';
+import * as fs from 'fs';
 import * as path from 'path';
 
 @Injectable()
