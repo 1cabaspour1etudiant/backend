@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { hash } from 'bcrypt';
 import { UpdateUserDto } from './dto/update-user-dto';
 import { MailerService } from '@nestjs-modules/mailer';
+import { JwtService } from '@nestjs/jwt';
 
 
 @Injectable()
@@ -16,10 +17,12 @@ export class UserService {
         @InjectRepository(User)
         private readonly userRespository: Repository<User>,
         private readonly mailerService: MailerService,
+        private readonly jwtService: JwtService,
     ) {}
 
     async createUser(createUserDto: CreateUserDto) {
         let user: User;
+        createUserDto.email = createUserDto.email.toUpperCase();
         user = await this.userRespository.findOne({ where: { email: createUserDto.email } });
 
         if (user) {
@@ -33,8 +36,15 @@ export class UserService {
             password: passwordHashed,
         });
 
-        const verificationLink = `${process.env.EMAIL_VERIFICATION_HOST}/auth/checkEmail`;
-        await this.mailerService.sendMail({
+        await this.userRespository.save(user);
+        const payload = {
+            email: user.email,
+            sub: user.id
+        };
+        const token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET });
+        const verificationLink = `${process.env.EMAIL_VERIFICATION_HOST}/auth/checkEmail?token=${token}`;
+
+        const emailOptions = {
             to: user.email,
             subject: 'Confirm your email adress',
             context: {
@@ -45,8 +55,9 @@ export class UserService {
                 verificationLink,
             },
             template: 'index',
-        });
-        await this.userRespository.save(user);
+        };
+
+        return this.mailerService.sendMail(emailOptions);
     }
 
     async getUserByEmail(email: string) {
