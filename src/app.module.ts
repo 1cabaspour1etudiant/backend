@@ -29,6 +29,7 @@ import { AuthModule } from './auth/auth.module';
         STORAGE_ACCESS_ID: Joi.required(),
         STORAGE_SECRET_ACCESS_KEY: Joi.required(),
         STORAGE_END_POINT: Joi.required(),
+        STORAGE_BUCKET_PICTURES: Joi.required(),
       }),
     }),
     UserModule,
