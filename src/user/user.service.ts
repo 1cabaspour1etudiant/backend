@@ -75,4 +75,8 @@ export class UserService {
         const user = await this.getUserByEmail(email);
         return user === undefined;
     }
+
+    async updateValidatedEmailStatus(user: User, emailAdressValidated: boolean) {
+        await this.userRespository.update({id : user.id}, { emailAdressValidated });
+    }
 }

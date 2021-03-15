@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities/user.entity';
@@ -44,5 +44,13 @@ export class AuthService {
         }
 
         return user;
+    }
+
+    async valideUserEmail(user: User) {
+        if (user.emailAdressValidated) {
+            throw new ConflictException('Email adress is already validated');
+        }
+
+        return this.userService.updateValidatedEmailStatus(user, true);
     }
 }
