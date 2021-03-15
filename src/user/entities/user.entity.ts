@@ -36,6 +36,9 @@ export class User {
     activity: string;
 
     @Column('boolean', { default: false })
+    emailAdressValidated: boolean;
+
+    @Column('boolean', { default: false })
     validated: boolean;
 
     @BeforeInsert()
