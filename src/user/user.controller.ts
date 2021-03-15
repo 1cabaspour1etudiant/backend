@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Patch, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
@@ -54,7 +54,10 @@ export class UserController {
         @UploadedFile() file: Express.Multer.File,
         @GetUser() user: User,
     ) {
-        
+        if (!file) {
+            throw new ForbiddenException('No file found in request');
+        }
+
         await this.userService.uploadUserProfilePicture(user, file.path);
     }
 }
