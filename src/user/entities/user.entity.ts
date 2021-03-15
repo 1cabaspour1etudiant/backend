@@ -42,7 +42,10 @@ export class User {
     validated: boolean;
 
     @Column('varchar', { nullable: true })
-    idPictureProfile: string;
+    profilePictureKey: string;
+
+    @Column('boolean', { default: false })
+    profilePictureValidated: string;
 
     @BeforeInsert()
     useEmailUppercase() {

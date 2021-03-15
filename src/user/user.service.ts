@@ -7,7 +7,9 @@ import { hash } from 'bcrypt';
 import { UpdateUserDto } from './dto/update-user-dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { JwtService } from '@nestjs/jwt';
-
+import { InjectS3, S3 } from 'nestjs-s3';
+import fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class UserService {
@@ -18,6 +20,7 @@ export class UserService {
         private readonly userRespository: Repository<User>,
         private readonly mailerService: MailerService,
         private readonly jwtService: JwtService,
+        @InjectS3() private readonly s3: S3,
     ) {}
 
     async createUser(createUserDto: CreateUserDto) {
@@ -78,5 +81,28 @@ export class UserService {
 
     async updateValidatedEmailStatus(user: User, emailAdressValidated: boolean) {
         await this.userRespository.update({id : user.id}, { emailAdressValidated });
+    }
+
+    private wrapperUpload(Key: string, fileStream: fs.ReadStream) {
+        return new Promise((resove, reject) => {
+            this.s3.upload({
+                Bucket: process.env.STORAGE_BUCKET_PICTURES,
+                Key,
+                Body: fileStream,
+            }, (error, data) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resove(data);
+                }
+            });
+        });
+    }
+
+    async uploadUserProfilePicture(user: User, filePath: string) {
+        const fileStream: fs.ReadStream = fs.createReadStream(filePath);
+        const Key = path.basename(filePath);
+        await this.wrapperUpload(Key, fileStream);
+        return this.userRespository.update({ id: user.id }, { profilePictureKey: Key });
     }
 }
