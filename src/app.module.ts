@@ -1,7 +1,11 @@
+import * as path from 'path';
 import * as Joi from 'joi';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
@@ -31,7 +35,20 @@ import { AuthModule } from './auth/auth.module';
         synchronize: process.env.PRODUCTION === 'false',
       }
     ),
-    AuthModule
+    AuthModule,
+    MailerModule.forRoot({
+      transport: process.env.EMAIL_TRANSPORT,
+      defaults: {
+        from: process.env.EMAIL_FROM,
+      },
+      template: {
+        dir: path.join(process.cwd(), 'templates'),
+        adapter: new HandlebarsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
+    }),
   ],
   providers: [AppService],
 })
