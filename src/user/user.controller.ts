@@ -1,4 +1,4 @@
-import { Body, Controller, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { CreateUserDto } from './dto/create-user-dto';
@@ -21,5 +21,12 @@ export class UserController {
     async updateUserMeInfos(@GetUser() user: User, @Body() updateUserDto: UpdateUserDto) {
         await this.userService.updateUser(user, updateUserDto);
         return updateUserDto;
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get('/me')
+    async getUserMeInfos(@GetUser() user: User) {
+        const { password, ...userDto } = user;
+        return userDto;
     }
 }
