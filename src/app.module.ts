@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { S3Module } from 'nestjs-s3';
 
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
@@ -21,6 +22,9 @@ import { AuthModule } from './auth/auth.module';
         POSTGRES_PASSWORD: Joi.required(),
         POSTGRES_DATABASE: Joi.required(),
         JWT_SECRET: Joi.required(),
+        STORAGE_ACCESS_ID: Joi.required(),
+        STORAGE_SECRET_ACCESS_KEY: Joi.required(),
+        STORAGE_END_POINT: Joi.required(),
       }),
     }),
     UserModule,
@@ -48,6 +52,17 @@ import { AuthModule } from './auth/auth.module';
           strict: true,
         },
       },
+    }),
+    S3Module.forRoot({
+      config: {
+        credentials: {
+          accessKeyId: process.env.STORAGE_ACCESS_ID,
+          secretAccessKey: process.env.STORAGE_SECRET_ACCESS_KEY,
+        },
+        endpoint: process.env.STORAGE_END_POINT,
+        s3ForcePathStyle: true,
+        signatureVersion: 'v4',
+      }
     }),
   ],
   providers: [AppService],
