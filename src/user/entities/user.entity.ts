@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class User {
@@ -37,4 +37,9 @@ export class User {
 
     @Column('boolean', { default: false })
     validated: boolean;
+
+    @BeforeInsert()
+    useEmailUppercase() {
+        this.email = this.email.toUpperCase();
+    }
 }
