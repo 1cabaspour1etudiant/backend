@@ -27,13 +27,13 @@ export class User {
     city: string;
 
     @Column()
-    postalCode: string;
+    zipCode: string;
 
     @Column()
-    role: string;
+    status: string;
 
     @Column()
-    activity: string;
+    activityArea: string;
 
     @Column('boolean', { default: false })
     emailAdressValidated: boolean;

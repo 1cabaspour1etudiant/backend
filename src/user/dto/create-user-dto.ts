@@ -34,13 +34,13 @@ export class CreateUserDto {
 
     @ApiProperty()
     @IsString()
-    postalCode: string;
+    zipCode: string;
 
     @ApiProperty()
     @IsString()
-    role:string;
+    status:string;
 
     @ApiProperty()
     @IsString()
-    activity: string;
+    activityArea: string;
 }
