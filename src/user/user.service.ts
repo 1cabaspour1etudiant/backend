@@ -106,4 +106,8 @@ export class UserService {
         await this.wrapperUpload(Key, fileStream);
         return this.userRespository.update({ id: user.id }, { profilePictureKey: Key });
     }
+
+    deleteUser(user: User) {
+        return this.userRespository.delete({ id: user.id });
+    }
 }

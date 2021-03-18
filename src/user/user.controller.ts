@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Get, Patch, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, ForbiddenException, Get, Patch, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
@@ -69,5 +69,11 @@ export class UserController {
         }
 
         await this.userService.uploadUserProfilePicture(user, file.path);
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Delete('/me')
+    async deleteUserMe(@GetUser() user:User) {
+        await this.userService.deleteUser(user);
     }
 }
