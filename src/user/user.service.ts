@@ -60,7 +60,8 @@ export class UserService {
             template: 'index',
         };
 
-        return this.mailerService.sendMail(emailOptions);
+        await this.mailerService.sendMail(emailOptions);
+        return user;
     }
 
     async getUserByEmail(email: string) {
