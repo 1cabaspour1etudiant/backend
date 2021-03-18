@@ -9,11 +9,16 @@ import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 import { diskStorage } from 'multer';
 import * as path from 'path';
+import { AuthService } from 'src/auth/auth.service';
+import { TypeTokenPayload } from 'src/auth/types/TypeTokenPayload';
 
 @Controller('user')
 export class UserController {
 
-    constructor(private readonly userService: UserService) {}
+    constructor(
+        private readonly userService: UserService,
+        private readonly authService: AuthService,
+    ) {}
 
     @Get('emailIsAvailable')
     async emailIsAvailable(@Query() emailIsAvailableDto: EmailIsAvailableDto) {
@@ -22,7 +27,12 @@ export class UserController {
 
     @Post()
     async createUser(@Body() createUserDto: CreateUserDto) {
-        await this.userService.createUser(createUserDto);
+        const user = await this.userService.createUser(createUserDto);
+        const payload: TypeTokenPayload = {
+            email: user.email,
+            sub: user.id,
+        };
+        return this.authService.getToken(payload);
     }
 
     @UseGuards(AuthGuard('jwt'))
