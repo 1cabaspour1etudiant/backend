@@ -3,7 +3,8 @@ import { ConflictException, ForbiddenException, Injectable } from '@nestjs/commo
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities/user.entity';
-
+import { TypeTokenDecoded } from './types/TypeTokenDecoded';
+import { TypeTokenPayload } from './types/TypeTokenPayload';
 
 @Injectable()
 export class AuthService {
@@ -23,15 +24,23 @@ export class AuthService {
         return await bcrypt.compare(password, user.password) ? user : null;
     }
 
-    async login(user: User) {
+    async getToken(payload: TypeTokenPayload) {
+        const accessToken = await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET });
+        const decoded = this.jwtService.decode(accessToken, { json: true }) as TypeTokenDecoded;
+
+        return {
+            accessToken,
+            accessTokenExpirationDate: decoded.exp,
+        };
+    }
+
+    login(user: User) {
         const payload = {
             email: user.email,
             sub: user.id
         };
 
-        return {
-            access_token: await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET })
-        };
+        return this.getToken(payload);
     }
 
     async verify(token: string) {
