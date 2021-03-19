@@ -11,6 +11,7 @@ import { InjectS3, S3 } from 'nestjs-s3';
 import * as fs from 'fs';
 import * as path from 'path';
 import vision from '@google-cloud/vision';
+import { Address } from './entities/address.entity';
 
 @Injectable()
 export class UserService {
@@ -19,10 +20,44 @@ export class UserService {
     constructor(
         @InjectRepository(User)
         private readonly userRespository: Repository<User>,
+        @InjectRepository(Address)
+        private readonly addressRepository: Repository<Address>,
         private readonly mailerService: MailerService,
         private readonly jwtService: JwtService,
         @InjectS3() private readonly s3: S3,
     ) {}
+
+    private async saveAddress(createUserDto: CreateUserDto) {
+        const address = this.addressRepository.create({
+            address: createUserDto.address,
+            city: createUserDto.city,
+            zipCode: createUserDto.zipCode,
+            longitude: 0,
+            latitude: 0,
+        });
+
+        await this.addressRepository.save(address);
+        return address;
+    }
+
+    private getUserPropertiesFromDto(createUserDto: CreateUserDto) {
+        const { address: addressStreet, city, zipCode, ...userProperties } = createUserDto;
+        return userProperties;
+    }
+
+    private async saveUser(address: Address, createUserDto: CreateUserDto) {
+        const userProperties = this.getUserPropertiesFromDto(createUserDto);
+        const passwordHashed = await hash(userProperties.password, this.saltRounds);
+
+        const user: User = this.userRespository.create({
+            ...userProperties,
+            password: passwordHashed,
+            address,
+        });
+
+        await this.userRespository.save(user);
+        return user;
+    }
 
     async createUser(createUserDto: CreateUserDto) {
         let user: User;
@@ -33,14 +68,11 @@ export class UserService {
             throw new ConflictException(`This email adress is already use`);
         }
 
-        const passwordHashed = await hash(createUserDto.password, this.saltRounds);
+        user = await this.saveUser(
+            await this.saveAddress(createUserDto),
+            createUserDto,
+        );
 
-        user = this.userRespository.create({
-            ...createUserDto,
-            password: passwordHashed,
-        });
-
-        await this.userRespository.save(user);
         const payload = {
             email: user.email,
             sub: user.id
@@ -66,14 +98,29 @@ export class UserService {
     }
 
     async getUserByEmail(email: string) {
-        return this.userRespository.findOne({ where: { email: email.toUpperCase() } });
+        return this.userRespository.findOne({
+            where: { email: email.toUpperCase() },
+            relations: ['address'],
+        });
     }
 
     async updateUser(user: User, updateUserDto: UpdateUserDto) {
         if (typeof updateUserDto.email === "string") {
             updateUserDto.email = updateUserDto.email.toUpperCase();
         }
-        await this.userRespository.update({ id: user.id }, { ...updateUserDto });
+
+        const { address, city, zipCode, ...userProperties } = updateUserDto;
+
+        if (address || city || zipCode) {
+            const addressProperties = {
+                address: address || user.address.address,
+                city: city || user.address.city,
+                zipCode: zipCode || user.address.zipCode,
+            };
+            await this.addressRepository.update({ id: user.address.id }, addressProperties);
+        }
+
+        await this.userRespository.update({ id: user.id }, userProperties);
     }
 
     async emailIsAvailable(email: string) {

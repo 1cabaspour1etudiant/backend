@@ -1,4 +1,5 @@
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Address } from "./address.entity";
 
 @Entity()
 export class User {
@@ -20,14 +21,9 @@ export class User {
     @Column()
     password: string;
 
-    @Column()
-    adress: string;
-
-    @Column()
-    city: string;
-
-    @Column()
-    zipCode: string;
+    @OneToOne(() => Address)
+    @JoinColumn()
+    address: Address;
 
     @Column()
     status: string;
