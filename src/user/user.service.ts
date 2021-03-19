@@ -123,8 +123,6 @@ export class UserService {
         if (medical === 'VERY_LIKELY' || medical === 'LIKELY' || medical === 'POSSIBLE') {
             throw new UnauthorizedException(buildErrorMessage('medical'));
         }
-
-        return true;
     }
 
     async uploadUserProfilePicture(user: User, filePath: string) {
