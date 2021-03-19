@@ -59,20 +59,7 @@ export class UserService {
         return user;
     }
 
-    async createUser(createUserDto: CreateUserDto) {
-        let user: User;
-        createUserDto.email = createUserDto.email.toUpperCase();
-        user = await this.userRespository.findOne({ where: { email: createUserDto.email } });
-
-        if (user) {
-            throw new ConflictException(`This email adress is already use`);
-        }
-
-        user = await this.saveUser(
-            await this.saveAddress(createUserDto),
-            createUserDto,
-        );
-
+    private async sendValidationEmail(user: User) {
         const payload = {
             email: user.email,
             sub: user.id
@@ -93,7 +80,25 @@ export class UserService {
             template: 'index',
         };
 
-        await this.mailerService.sendMail(emailOptions);
+        return this.mailerService.sendMail(emailOptions);
+    }
+
+    async createUser(createUserDto: CreateUserDto) {
+        let user: User;
+        createUserDto.email = createUserDto.email.toUpperCase();
+        user = await this.userRespository.findOne({ where: { email: createUserDto.email } });
+
+        if (user) {
+            throw new ConflictException(`This email adress is already use`);
+        }
+
+        user = await this.saveUser(
+            await this.saveAddress(createUserDto),
+            createUserDto,
+        );
+
+        await this.sendValidationEmail(user);
+
         return user;
     }
 
