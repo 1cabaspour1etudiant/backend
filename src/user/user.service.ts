@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user-dto';
@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectS3, S3 } from 'nestjs-s3';
 import * as fs from 'fs';
 import * as path from 'path';
+import vision from '@google-cloud/vision';
 
 @Injectable()
 export class UserService {
@@ -100,7 +101,35 @@ export class UserService {
         });
     }
 
+    private async checkProfilePicture(filePath: string) {
+        const client = new vision.ImageAnnotatorClient();
+        const [result] = await client.safeSearchDetection(filePath);
+        const { adult, violence, racy, medical } = result.safeSearchAnnotation;
+
+        const buildErrorMessage = (kind:string) => `Your picture seems including ${kind} content`;
+
+        if (adult === 'VERY_LIKELY' || adult === 'LIKELY' || adult === 'POSSIBLE') {
+            throw new UnauthorizedException(buildErrorMessage('adult'));
+        }
+
+        if (violence === 'VERY_LIKELY' || violence === 'LIKELY' || violence === 'POSSIBLE') {
+            throw new UnauthorizedException(buildErrorMessage('violence'));
+        }
+
+        if (racy === 'VERY_LIKELY' || racy === 'LIKELY' || racy === 'POSSIBLE') {
+            throw new UnauthorizedException(buildErrorMessage('racy'));
+        }
+
+        if (medical === 'VERY_LIKELY' || medical === 'LIKELY' || medical === 'POSSIBLE') {
+            throw new UnauthorizedException(buildErrorMessage('medical'));
+        }
+
+        return true;
+    }
+
     async uploadUserProfilePicture(user: User, filePath: string) {
+        await this.checkProfilePicture(filePath);
+
         const fileStream: fs.ReadStream = fs.createReadStream(filePath);
         const Key = path.basename(filePath);
         await this.wrapperUpload(Key, fileStream);
