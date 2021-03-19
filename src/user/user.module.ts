@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { forwardRef, HttpModule, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { MulterModule } from '@nestjs/platform-express';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -19,6 +19,7 @@ import { UserService } from './user.service';
     MulterModule.register({
       dest: process.env.STORAGE_TEMPORARY_IMAGE,
     }),
+    HttpModule,
   ],
   controllers: [UserController],
   providers: [UserService],

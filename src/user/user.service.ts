@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, HttpService, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user-dto';
@@ -13,9 +13,22 @@ import * as path from 'path';
 import vision from '@google-cloud/vision';
 import { Address } from './entities/address.entity';
 
+type Geometry = {
+    location: {
+        lat: number,
+        lng: number,
+    }
+};
+
+type GeoCodingResponse = {
+    results: { geometry: Geometry }[],
+    status: string,
+};
+
 @Injectable()
 export class UserService {
-    private readonly saltRounds = 10;
+    private static readonly saltRounds = 10;
+    private static urlResolveAddress = 'https://maps.googleapis.com/maps/api/geocode/json';
 
     constructor(
         @InjectRepository(User)
@@ -24,16 +37,42 @@ export class UserService {
         private readonly addressRepository: Repository<Address>,
         private readonly mailerService: MailerService,
         private readonly jwtService: JwtService,
-        @InjectS3() private readonly s3: S3,
+        @InjectS3()
+        private readonly s3: S3,
+        private readonly httpService: HttpService,
     ) {}
 
+    private async resolveAddress(addressStreet:string, city: string, zipCode: string) {
+        const address = `${addressStreet},${city},${zipCode},France`;
+        const options = {
+            params: {
+                address,
+                key: process.env.GOOGLE_API_KEY,
+            },
+        };
+
+        const { data: { results } } = await this.httpService.get<GeoCodingResponse>(UserService.urlResolveAddress, options).toPromise();
+
+        if (results.length === 0) {
+            throw new NotFoundException('Unknow address');
+        }
+
+        return results[0].geometry.location;
+    }
+
     private async saveAddress(createUserDto: CreateUserDto) {
+        const { lat, lng } = await this.resolveAddress(
+            createUserDto.address,
+            createUserDto.city,
+            createUserDto.zipCode,
+        );
+
         const address = this.addressRepository.create({
             address: createUserDto.address,
             city: createUserDto.city,
             zipCode: createUserDto.zipCode,
-            longitude: 0,
-            latitude: 0,
+            longitude: lng,
+            latitude: lat,
         });
 
         await this.addressRepository.save(address);
@@ -47,7 +86,7 @@ export class UserService {
 
     private async saveUser(address: Address, createUserDto: CreateUserDto) {
         const userProperties = this.getUserPropertiesFromDto(createUserDto);
-        const passwordHashed = await hash(userProperties.password, this.saltRounds);
+        const passwordHashed = await hash(userProperties.password, UserService.saltRounds);
 
         const user: User = this.userRespository.create({
             ...userProperties,
