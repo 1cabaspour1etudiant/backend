@@ -73,6 +73,10 @@ export class UserService {
             zipCode: createUserDto.zipCode,
             longitude: lng,
             latitude: lat,
+            location: {
+                type: 'Point',
+                coordinates: [lng, lat],
+            }
         });
 
         await this.addressRepository.save(address);

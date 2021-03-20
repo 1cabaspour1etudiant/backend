@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Geometry } from 'geojson';
 
 @Entity()
 export class Address {
@@ -19,4 +20,7 @@ export class Address {
 
     @Column('float8')
     latitude: number;
+
+    @Column('geometry')
+    location: Geometry;
 }
