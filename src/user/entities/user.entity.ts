@@ -1,6 +1,12 @@
 import { BeforeInsert, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Address } from "./address.entity";
 
+export enum UserStatus {
+    ADMIN = 'admin',
+    GODSON = 'godson',
+    GODFATHER = 'godfather'
+};
+
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
@@ -25,7 +31,11 @@ export class User {
     @JoinColumn()
     address: Address;
 
-    @Column()
+    @Column({
+        type: 'enum',
+        enum: UserStatus,
+        default: UserStatus.GODSON,
+    })
     status: string;
 
     @Column()
