@@ -33,6 +33,7 @@ import { AuthModule } from './auth/auth.module';
         STORAGE_TEMPORARY_IMAGE: Joi.required(),
         GOOGLE_APPLICATION_CREDENTIALS: Joi.required(),
         GOOGLE_API_KEY: Joi.required(),
+        PORT: Joi.number().required(),
       }),
     }),
     UserModule,
