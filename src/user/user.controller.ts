@@ -11,6 +11,7 @@ import { diskStorage } from 'multer';
 import * as path from 'path';
 import { AuthService } from 'src/auth/auth.service';
 import { TypeTokenPayload } from 'src/auth/types/TypeTokenPayload';
+import { UserSearch } from './types/userSearch';
 
 @Controller('user')
 export class UserController {
@@ -75,5 +76,34 @@ export class UserController {
     @Delete('/me')
     async deleteUserMe(@GetUser() user:User) {
         await this.userService.deleteUser(user);
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get('/search')
+    async getClosestUsers(@GetUser() user:User) {
+        const page = 0;
+        const pageSize = 20;
+        const start = pageSize * page;
+        const end = start + pageSize;
+
+        const closestUsers = await this.userService.getClosestUsers(user);
+
+        const items: UserSearch[] = closestUsers.slice(start, end)
+            .map((user) => {
+                return {
+                    id: user.id,
+                    firstname: user.firstname,
+                    activityArea: user.activityArea,
+                    address: user.address,
+                    distance: user.distance,
+                };
+            });
+
+        return {
+            page,
+            pageSize,
+            items,
+            lastPage: end >= closestUsers.length,
+        };
     }
 }
