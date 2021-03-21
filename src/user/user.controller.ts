@@ -12,6 +12,7 @@ import * as path from 'path';
 import { AuthService } from 'src/auth/auth.service';
 import { TypeTokenPayload } from 'src/auth/types/TypeTokenPayload';
 import { UserSearch } from './types/userSearch';
+import { SearchUserDto } from './dto/search-user-dto';
 
 @Controller('user')
 export class UserController {
@@ -80,9 +81,8 @@ export class UserController {
 
     @UseGuards(AuthGuard('jwt'))
     @Get('/search')
-    async getClosestUsers(@GetUser() user:User) {
-        const page = 0;
-        const pageSize = 20;
+    async getClosestUsers(@GetUser() user:User, @Query() searchUserDto: SearchUserDto) {
+        const { page, pageSize } = searchUserDto;
         const start = pageSize * page;
         const end = start + pageSize;
 
