@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from './user.entity';
 import { Geometry } from 'geojson';
 
 @Entity()
@@ -23,4 +24,7 @@ export class Address {
 
     @Column('geometry')
     location: Geometry;
+
+    @OneToOne(() => User, user => user.address)
+    user: User;
 }
