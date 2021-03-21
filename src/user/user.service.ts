@@ -232,4 +232,32 @@ export class UserService {
     deleteUser(user: User) {
         return this.userRespository.delete({ id: user.id });
     }
+
+    async getClosestUsers(user: User) {
+        const origin = {
+            type: 'Point',
+            coordinates: [
+                user.address.longitude,
+                user.address.latitude
+            ],
+        };
+
+        const query = this.userRespository
+            .query(`
+                SELECT DISTINCT ON (distance) "user"."id" AS "id",
+                "user"."firstname" AS "firstname",
+                "user"."activityArea" AS "activityArea",
+                "address"."address" AS "address",
+                ST_Distance(location, ST_SetSRID(ST_GeomFromGeoJSON($1), ST_SRID(location))) AS "distance"
+                FROM "user" "user" INNER JOIN "address" "address" ON "address"."id"="user"."addressId"
+                WHERE "user"."id" != $2 AND "user"."status" != $3
+                ORDER BY distance ASC
+            `, [
+                JSON.stringify(origin),
+                user.id,
+                user.status,
+            ]);
+
+        return query;
+    }
 }
