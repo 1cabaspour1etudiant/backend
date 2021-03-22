@@ -245,6 +245,14 @@ export class UserService {
         return this.userRespository.update({ id: user.id }, { profilePictureKey: Key });
     }
 
+    async getUserProfilePicture(user: User) {
+        if (user.profilePictureKey === null) {
+            throw new NotFoundException('No picture found');
+        }
+        const objectS3 = await this.wrapperDownload(user.profilePictureKey);
+        return objectS3.Body.toString('base64');
+    }
+
     deleteUser(user: User) {
         return this.userRespository.delete({ id: user.id });
     }
