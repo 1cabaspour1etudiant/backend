@@ -74,6 +74,12 @@ export class UserController {
     }
 
     @UseGuards(AuthGuard('jwt'))
+    @Get('/me/profilePicture')
+    getUserMeProfilePicture(@GetUser() user: User) {
+        return this.userService.getUserProfilePicture(user);
+    }
+
+    @UseGuards(AuthGuard('jwt'))
     @Delete('/me')
     async deleteUserMe(@GetUser() user:User) {
         await this.userService.deleteUser(user);
