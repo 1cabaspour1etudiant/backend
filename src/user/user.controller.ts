@@ -13,6 +13,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { TypeTokenPayload } from 'src/auth/types/TypeTokenPayload';
 import { UserSearch } from './types/userSearch';
 import { SearchUserDto } from './dto/search-user-dto';
+import { GetUserProfilePictureDto } from './dto/get-user-profile-picture-dto';
 
 @Controller('user')
 export class UserController {
@@ -111,5 +112,11 @@ export class UserController {
             items,
             lastPage: end >= closestUsers.length,
         };
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get('/profilePicture')
+    async getUserProfilePicture(@Query() { id }: GetUserProfilePictureDto) {
+        return this.userService.getUserProfilePictureById(id);
     }
 }
