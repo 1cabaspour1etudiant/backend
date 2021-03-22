@@ -109,8 +109,8 @@ export class UserController {
         return {
             page,
             pageSize,
-            items,
             lastPage: end >= closestUsers.length,
+            items,
         };
     }
 
