@@ -141,7 +141,9 @@ export class UserService {
             createUserDto,
         );
 
-        await this.sendValidationEmail(user);
+        if (process.env.PRODUCTION === 'true') {
+            await this.sendValidationEmail(user);
+        }
 
         return user;
     }
