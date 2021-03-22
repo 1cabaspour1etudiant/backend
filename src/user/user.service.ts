@@ -7,11 +7,12 @@ import { hash } from 'bcrypt';
 import { UpdateUserDto } from './dto/update-user-dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { JwtService } from '@nestjs/jwt';
-import { InjectS3, S3 } from 'nestjs-s3';
+import { InjectS3, S3 as nestS3 } from 'nestjs-s3';
 import * as fs from 'fs';
 import * as path from 'path';
 import vision from '@google-cloud/vision';
 import { Address } from './entities/address.entity';
+import { S3 } from 'aws-sdk';
 
 type Geometry = {
     location: {
@@ -38,7 +39,7 @@ export class UserService {
         private readonly mailerService: MailerService,
         private readonly jwtService: JwtService,
         @InjectS3()
-        private readonly s3: S3,
+        private readonly s3: nestS3,
         private readonly httpService: HttpService,
     ) {}
 
@@ -191,6 +192,21 @@ export class UserService {
                     reject(error);
                 } else {
                     resove(data);
+                }
+            });
+        });
+    }
+
+    private wrapperDownload(Key: string): Promise<S3.GetObjectOutput> {
+        return new Promise((resolve, reject) => {
+            this.s3.getObject({
+                Bucket: process.env.STORAGE_BUCKET_PICTURES,
+                Key,
+            }, (error, data) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(data);
                 }
             });
         });
