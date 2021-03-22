@@ -253,6 +253,15 @@ export class UserService {
         return objectS3.Body.toString('base64');
     }
 
+    async getUserProfilePictureById(userId: number) {
+        const user = await this.userRespository.findOne(userId);
+        if (!user) {
+            throw new NotFoundException(`No user found for id ${userId}`);
+        }
+
+        return this.getUserProfilePicture(user);
+    }
+
     deleteUser(user: User) {
         return this.userRespository.delete({ id: user.id });
     }
