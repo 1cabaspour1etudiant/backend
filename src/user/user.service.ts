@@ -303,6 +303,20 @@ export class UserService {
         return this.sponsorshipRepository.findOne({ where: { godfatherId, godsonId } });
     }
 
+    async createSponsorship(godfatherId: number, godsonId: number) {
+        let sponsorship = await this.getSponsorship(godfatherId, godsonId);
+        if (sponsorship) {
+            throw new ConflictException('Sponsorship already exist');
+        }
+
+        sponsorship = new Sponsorship();
+        sponsorship.godfatherId = godfatherId;
+        sponsorship.godsonId = godsonId;
+        sponsorship.date = new Date();
+
+        return this.sponsorshipRepository.save(sponsorship);
+    }
+
     async getGodfatherGodchildren(user: User) {
         const query = await this.sponsorshipRepository
             .query(`
