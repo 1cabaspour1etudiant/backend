@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { CreateSponsorShipDto } from './dto/create-sponsorship-dto';
@@ -25,5 +25,12 @@ export class SponsorshipController {
         }
 
         await this.userService.createSponsorship(godfatherId, godsonId, user.id === godfatherId ? godsonId : godfatherId);
+    }
+
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get('/requests')
+    async getAwatingSponsorshipRequests(@GetUser() user:User) {
+        return this.userService.getAwatingSponsoshipRequests(user);
     }
 }
