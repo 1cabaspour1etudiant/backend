@@ -8,6 +8,7 @@ import { Sponsorship } from './entities/sponsorship.entity';
 import { User } from './entities/user.entity';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { SponsorshipController } from './sponsorship.controller';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { UserService } from './user.service';
     }),
     HttpModule,
   ],
-  controllers: [UserController],
+  controllers: [UserController, SponsorshipController],
   providers: [UserService],
   exports: [UserService]
 })
