@@ -299,6 +299,10 @@ export class UserService {
         return query;
     }
 
+    async getSponsorship(godfatherId: number, godsonId: number) {
+        return this.sponsorshipRepository.findOne({ where: { godfatherId, godsonId } });
+    }
+
     async getGodfatherGodchildren(user: User) {
         const query = await this.sponsorshipRepository
             .query(`
