@@ -283,7 +283,7 @@ export class UserService {
                 "user"."firstname" AS "firstname",
                 "user"."activityArea" AS "activityArea",
                 "address"."address" AS "address",
-                ST_Distance(location, ST_SetSRID(ST_GeomFromGeoJSON($1), ST_SRID(location))) AS "distance"
+                ST_Distance(location, ST_SetSRID(ST_GeomFromGeoJSON($1), ST_SRID(location)), true) AS "distance"
                 FROM "user" "user" INNER JOIN "address" "address" ON "address"."id"="user"."addressId"
                 WHERE "user"."id" != $2 AND "user"."status" != $3
                 ORDER BY distance ASC
