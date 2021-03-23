@@ -1,5 +1,6 @@
 import { Body, Controller, ForbiddenException, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { CreateSponsorShipDto } from './dto/create-sponsorship-dto';
 import { User } from './entities/user.entity';
@@ -10,6 +11,7 @@ export class SponsorshipController {
 
     constructor(private readonly userService: UserService) {}
 
+    @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @Post()
     async createSponsorShip(
@@ -27,7 +29,7 @@ export class SponsorshipController {
         await this.userService.createSponsorship(godfatherId, godsonId, user.id === godfatherId ? godsonId : godfatherId);
     }
 
-
+    @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @Get('/requests')
     async getAwatingSponsorshipRequests(@GetUser() user:User) {
