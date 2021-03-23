@@ -378,4 +378,16 @@ export class UserService {
 
         return query;
     }
+
+    createPage<T>(page:number, pageSize: number, elements: T[]) {
+        const start = pageSize * page;
+        const end = start + pageSize;
+        const items = elements.slice(start, end);
+        return {
+            page,
+            pageSize: items.length,
+            lastPage: end >= elements.length,
+            items:items,
+        };
+    }
 }

@@ -95,30 +95,9 @@ export class UserController {
     @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @Get('/search')
-    async getClosestUsers(@GetUser() user:User, @Query() searchUserDto: SearchUserDto) {
-        const { page, pageSize } = searchUserDto;
-        const start = pageSize * page;
-        const end = start + pageSize;
-
+    async getClosestUsers(@GetUser() user:User, @Query() { page, pageSize }: SearchUserDto) {
         const closestUsers = await this.userService.getClosestUsers(user);
-
-        const items: UserSearch[] = closestUsers.slice(start, end)
-            .map((user) => {
-                return {
-                    id: user.id,
-                    firstname: user.firstname,
-                    activityArea: user.activityArea,
-                    address: user.address,
-                    distance: user.distance,
-                };
-            });
-
-        return {
-            page,
-            pageSize: items.length,
-            lastPage: end >= closestUsers.length,
-            items,
-        };
+        return this.userService.createPage<UserSearch>(page, pageSize, closestUsers);
     }
 
     @ApiBearerAuth()
