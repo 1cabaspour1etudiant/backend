@@ -8,9 +8,12 @@ export class Sponsorship {
 
     @Column()
     @OneToOne(() => User, (user) => user.id)
-    godFatherId: number;
+    godfatherId: number;
 
     @Column()
     @OneToOne(() => User, (user) => user.id)
-    godSonId: number;
+    godsonId: number;
+
+    @Column('date')
+    date: Date;
 }
