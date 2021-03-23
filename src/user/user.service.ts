@@ -303,9 +303,12 @@ export class UserService {
         return this.sponsorshipRepository.findOne({ where: { godfatherId, godsonId } });
     }
 
-    async createSponsorship(godfatherId: number, godsonId: number) {
+    async createSponsorship(godfatherId: number, godsonId: number, recipient: number) {
         let sponsorship;
-        const godfather = await this.userRespository.findOne({ where: { id: godfatherId } });
+        let godfather;
+        let godson;
+
+        godfather = await this.userRespository.findOne({ where: { id: godfatherId } });
         if (!godfather) {
             throw new NotFoundException(`Unknow godfather for id ${godfatherId}`);
         }
@@ -314,8 +317,7 @@ export class UserService {
             throw new ForbiddenException(`Id ${godfatherId} does not refer to a godfather`);
         }
 
-        const godson = await this.userRespository.findOne({ where: { id: godsonId } });
-
+        godson = await this.userRespository.findOne({ where: { id: godsonId } });
         if (!godson) {
             throw new NotFoundException(`Unknow godson for id ${godsonId}`);
         }
