@@ -340,6 +340,15 @@ export class UserService {
         return this.sponsorshipRepository.save(sponsorship);
     }
 
+    async getAwatingSponsoshipRequests(user: User) {
+        return this.sponsorshipRepository.find({
+            where:[
+                { godfatherId: user.id },
+                { godsonId: user.id },
+            ]
+        });
+    }
+
     async getGodfatherGodchildren(user: User) {
         const query = await this.sponsorshipRepository
             .query(`
