@@ -14,6 +14,7 @@ import { TypeTokenPayload } from 'src/auth/types/TypeTokenPayload';
 import { UserSearch } from './types/userSearch';
 import { SearchUserDto } from './dto/search-user-dto';
 import { GetUserProfilePictureDto } from './dto/get-user-profile-picture-dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
@@ -38,6 +39,7 @@ export class UserController {
         return this.authService.getToken(payload);
     }
 
+    @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @Patch('/me')
     async updateUserMeInfos(@GetUser() user: User, @Body() updateUserDto: UpdateUserDto) {
@@ -45,6 +47,7 @@ export class UserController {
         return updateUserDto;
     }
 
+    @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @Get('/me')
     async getUserMeInfos(@GetUser() user: User) {
@@ -52,6 +55,7 @@ export class UserController {
         return userDto;
     }
 
+    @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
@@ -74,18 +78,21 @@ export class UserController {
         await this.userService.uploadUserProfilePicture(user, file.path);
     }
 
+    @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @Get('/me/profilePicture')
     getUserMeProfilePicture(@GetUser() user: User) {
         return this.userService.getUserProfilePicture(user);
     }
 
+    @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @Delete('/me')
     async deleteUserMe(@GetUser() user:User) {
         await this.userService.deleteUser(user);
     }
 
+    @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @Get('/search')
     async getClosestUsers(@GetUser() user:User, @Query() searchUserDto: SearchUserDto) {
@@ -114,6 +121,7 @@ export class UserController {
         };
     }
 
+    @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @Get('/profilePicture')
     async getUserProfilePicture(@Query() { id }: GetUserProfilePictureDto) {
