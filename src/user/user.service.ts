@@ -1,4 +1,4 @@
-import { ConflictException, HttpService, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, HttpService, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user-dto';
@@ -304,7 +304,27 @@ export class UserService {
     }
 
     async createSponsorship(godfatherId: number, godsonId: number) {
-        let sponsorship = await this.getSponsorship(godfatherId, godsonId);
+        let sponsorship;
+        const godfather = await this.userRespository.findOne({ where: { id: godfatherId } });
+        if (!godfather) {
+            throw new NotFoundException(`Unknow godfather for id ${godfatherId}`);
+        }
+
+        if (godfather.status !== 'godfather') {
+            throw new ForbiddenException(`Id ${godfatherId} does not refer to a godfather`);
+        }
+
+        const godson = await this.userRespository.findOne({ where: { id: godsonId } });
+
+        if (!godson) {
+            throw new NotFoundException(`Unknow godson for id ${godsonId}`);
+        }
+
+        if (godson.status !== 'godson') {
+            throw new ForbiddenException(`Id ${godsonId} does not refer to a godson`);
+        }
+
+        sponsorship = await this.getSponsorship(godfatherId, godsonId);
         if (sponsorship) {
             throw new ConflictException('Sponsorship already exist');
         }
