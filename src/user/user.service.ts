@@ -13,6 +13,7 @@ import * as path from 'path';
 import vision from '@google-cloud/vision';
 import { Address } from './entities/address.entity';
 import { S3 } from 'aws-sdk';
+import { Sponsorship } from './entities/sponsorship.entity';
 
 type Geometry = {
     location: {
@@ -41,6 +42,8 @@ export class UserService {
         @InjectS3()
         private readonly s3: nestS3,
         private readonly httpService: HttpService,
+        @InjectRepository(Sponsorship)
+        private readonly sponsorshipRepository: Repository<Sponsorship>,
     ) {}
 
     private async resolveAddress(addressStreet:string, city: string, zipCode: string) {
@@ -291,6 +294,23 @@ export class UserService {
                 JSON.stringify(origin),
                 user.id,
                 user.status,
+            ]);
+
+        return query;
+    }
+
+    async getGodfatherGodchildren(user: User) {
+        const query = await this.sponsorshipRepository
+            .query(`
+                SELECT "user"."id" AS "id",
+                "user"."firstname" AS "firstname",
+                "user"."lastname" AS "lastname",
+                "address"."address" AS "address",
+                FROM "user" "user" INNER JOIN "address" "address" ON "address"."id"="user"."addressId"
+                INNER JOIN "sponsorship" "sponsorship" ON "sponsorship"."godsonId"="user"."id"
+                WHERE "sponsorship"."godfatherId"=$1
+            `, [
+                user.id
             ]);
 
         return query;
