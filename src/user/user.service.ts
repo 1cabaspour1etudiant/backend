@@ -350,17 +350,16 @@ export class UserService {
     }
 
     async acceptAwaitingSponsorshipRequest(user:User, sponsorshipId: number) {
-        const sponsorship = await this.sponsorshipRepository.findOne({ where: { id: sponsorshipId } });
+        const sponsorship = await this.sponsorshipRepository.findOne({ where: { sponsorshipId } });
         if (!sponsorshipId) {
             throw new NotFoundException(`Unknow sponsorship's id ${sponsorshipId}`);
         }
 
         if (sponsorship.recipientId !== user.id) {
-            throw new ForbiddenException('Not allowed to validation this sponsorship request');
+            throw new ForbiddenException('Not allowed to validate this sponsorship request');
         }
 
-        sponsorship.validated = true;
-        return this.sponsorshipRepository.save(sponsorship);
+        return this.sponsorshipRepository.update({ sponsorshipId }, { validated: true });
     }
 
     async getGodfatherGodchildren(user: User) {
