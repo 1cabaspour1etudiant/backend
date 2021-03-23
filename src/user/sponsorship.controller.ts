@@ -1,9 +1,10 @@
-import { Body, Controller, ForbiddenException, Get, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { AcceptSponsorshipDto } from './dto/accept-sponsorship-dto';
 import { CreateSponsorShipDto } from './dto/create-sponsorship-dto';
+import { GetSponsorshipRequestsDto } from './dto/get-sponsorship-requests-dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 
@@ -33,8 +34,19 @@ export class SponsorshipController {
     @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @Get('/requests')
-    async getAwatingSponsorshipRequests(@GetUser() user:User) {
-        return this.userService.getAwatingSponsoshipRequests(user);
+    async getAwatingSponsorshipRequests(@GetUser() user:User, @Query() { page, pageSize }: GetSponsorshipRequestsDto) {
+        const start = pageSize * page;
+        const end = start + pageSize;
+        const awaitingRequests = await this.userService.getAwatingSponsoshipRequests(user);
+
+        const items = awaitingRequests.slice(start, end);
+
+        return {
+            page,
+            pageSize: items.length,
+            lastPage: end >= awaitingRequests.length,
+            items,
+        };
     }
 
     @ApiBearerAuth()
