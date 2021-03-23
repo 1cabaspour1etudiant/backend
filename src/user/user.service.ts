@@ -343,8 +343,8 @@ export class UserService {
     async getAwatingSponsoshipRequests(user: User) {
         return this.sponsorshipRepository.find({
             where:[
-                { godfatherId: user.id },
-                { godsonId: user.id },
+                { godfatherId: user.id, validated: false },
+                { godsonId: user.id, validated: false },
             ]
         });
     }
