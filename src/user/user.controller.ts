@@ -15,6 +15,7 @@ import { UserSearch } from './types/userSearch';
 import { SearchUserDto } from './dto/search-user-dto';
 import { GetUserProfilePictureDto } from './dto/get-user-profile-picture-dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { GetUserByIdDto } from './dto/abstract-get-user-by-id-dto';
 
 @Controller('user')
 export class UserController {
@@ -103,7 +104,7 @@ export class UserController {
     @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @Get('/profilePicture')
-    async getUserProfilePicture(@Query() { id }: GetUserProfilePictureDto) {
-        return this.userService.getUserProfilePictureById(id);
+    async getUserProfilePicture(@Query() { userId }: GetUserProfilePictureDto) {
+        return this.userService.getUserProfilePictureById(userId);
     }
 }
