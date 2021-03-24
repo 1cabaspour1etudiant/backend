@@ -349,12 +349,17 @@ export class UserService {
         });
     }
 
-    async acceptAwaitingSponsorshipRequest(user:User, sponsorshipId: number) {
+    private async checkSponsorship(sponsorshipId: number) {
         const sponsorship = await this.sponsorshipRepository.findOne({ where: { sponsorshipId } });
         if (!sponsorshipId) {
             throw new NotFoundException(`Unknow sponsorship's id ${sponsorshipId}`);
         }
 
+        return sponsorship;
+    }
+
+    async acceptAwaitingSponsorshipRequest(user:User, sponsorshipId: number) {
+        const sponsorship = await this.checkSponsorship(sponsorshipId);
         if (sponsorship.recipientId !== user.id) {
             throw new ForbiddenException('Not allowed to validate this sponsorship request');
         }
