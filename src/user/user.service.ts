@@ -382,8 +382,10 @@ export class UserService {
                 SELECT "user"."id" AS "id",
                 "user"."firstname" AS "firstname",
                 "user"."lastname" AS "lastname",
+                "user"."tel" AS "tel",
                 "address"."address" AS "address",
-                FROM "user" "user" INNER JOIN "address" "address" ON "address"."id"="user"."addressId"
+                FROM "user" "user"
+                INNER JOIN "address" "address" ON "address"."id"="user"."addressId"
                 INNER JOIN "sponsorship" "sponsorship" ON "sponsorship"."godsonId"="user"."id"
                 WHERE "sponsorship"."godfatherId"=$1
             `, [
