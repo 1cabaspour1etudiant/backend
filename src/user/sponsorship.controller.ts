@@ -1,9 +1,10 @@
-import { Body, Controller, ForbiddenException, Get, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, ForbiddenException, Get, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { AcceptSponsorshipDto } from './dto/accept-sponsorship-dto';
 import { CreateSponsorShipDto } from './dto/create-sponsorship-dto';
+import { DeleteSponsorshipDto } from './dto/delete-sponsorship-dto';
 import { GetSponsorshipRequestsDto } from './dto/get-sponsorship-requests-dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
@@ -44,5 +45,12 @@ export class SponsorshipController {
     @Put('/accept')
     async acceptSponsorship(@GetUser() user: User, @Body() { sponsorshipId }: AcceptSponsorshipDto) {
         await this.userService.acceptAwaitingSponsorshipRequest(user, sponsorshipId);
+    }
+
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
+    @Delete()
+    async deleteSponsorship(@GetUser() user: User, @Body() { sponsorshipId }: DeleteSponsorshipDto) {
+        await this.userService.deleteSponsorship(user, sponsorshipId);
     }
 }
