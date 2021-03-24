@@ -46,6 +46,18 @@ export class UserService {
         private readonly sponsorshipRepository: Repository<Sponsorship>,
     ) {}
 
+    private getOriginPoint(user: User) {
+        return JSON.stringify(
+            {
+                type: 'Point',
+                coordinates: [
+                    user.address.longitude,
+                    user.address.latitude
+                ],
+            }
+        );
+    }
+
     private async resolveAddress(addressStreet:string, city: string, zipCode: string) {
         const address = `${addressStreet},${city},${zipCode},France`;
         const options = {
@@ -272,14 +284,6 @@ export class UserService {
     }
 
     async getClosestUsers(user: User) {
-        const origin = {
-            type: 'Point',
-            coordinates: [
-                user.address.longitude,
-                user.address.latitude
-            ],
-        };
-
         const query = this.userRespository
             .query(`
                 SELECT DISTINCT ON (distance) "user"."id" AS "id",
@@ -291,7 +295,7 @@ export class UserService {
                 WHERE "user"."id" != $2 AND "user"."status" != $3
                 ORDER BY distance ASC
             `, [
-                JSON.stringify(origin),
+                this.getOriginPoint(user),
                 user.id,
                 user.status,
             ]);
@@ -433,21 +437,13 @@ export class UserService {
             throw new NotFoundException(`No user found for id ${userId}`);
         }
 
-        const origin = {
-            type: 'Point',
-            coordinates: [
-                user.address.longitude,
-                user.address.latitude
-            ],
-        };
-
         const [ { distance } ]: { distance: number }[] = await this.userRespository
             .query(`
                 SELECT ST_Distance(location, ST_SetSRID(ST_GeomFromGeoJSON($1), ST_SRID(location)), true) AS "distance"
                 FROM "user" "user"
                 INNER JOIN "address" "address" ON "user"."addressId"="address"."id"
                 WHERE "user"."id"=$2
-            `, [ JSON.stringify(origin), userId ]);
+            `, [ this.getOriginPoint(user), userId ]);
 
         const {
             password,
