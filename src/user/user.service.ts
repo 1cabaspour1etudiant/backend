@@ -367,6 +367,15 @@ export class UserService {
         return this.sponsorshipRepository.update({ sponsorshipId }, { validated: true });
     }
 
+    async deleteSponsorship(user: User, sponsorshipId: number) {
+        const sponsorship = await this.checkSponsorship(sponsorshipId);
+        if (sponsorship.godsonId !== user.id && sponsorship.godfatherId !== user.id) {
+            throw new ForbiddenException('Not allowed to remove a sponsorship which is not yours');
+        }
+
+        return this.sponsorshipRepository.delete({ sponsorshipId });
+    }
+
     async getGodfatherGodchildren(user: User) {
         const query = await this.sponsorshipRepository
             .query(`
