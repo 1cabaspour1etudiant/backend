@@ -426,4 +426,25 @@ export class UserService {
             items:items,
         };
     }
+
+    async getUserInfos(userId: number) {
+        const user = await this.userRespository.findOne({ where: { id: userId } });
+        if (!user) {
+            throw new NotFoundException(`No user found for id ${userId}`);
+        }
+
+        const {
+            password,
+            address,
+            emailAdressValidated,
+            profilePictureKey,
+            profilePictureValidated,
+            validated,
+            email,
+            lastname,
+            ...userInfos
+        } = user;
+
+        return userInfos;
+    }
 }
