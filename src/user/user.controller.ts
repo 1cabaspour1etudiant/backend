@@ -15,7 +15,6 @@ import { UserSearch } from './types/userSearch';
 import { SearchUserDto } from './dto/search-user-dto';
 import { GetUserProfilePictureDto } from './dto/get-user-profile-picture-dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { GetUserByIdDto } from './dto/abstract-get-user-by-id-dto';
 import { GetUserDto } from './dto/get-user-dto';
 
 @Controller('user')
