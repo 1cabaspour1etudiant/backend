@@ -303,7 +303,7 @@ export class UserService {
         return this.sponsorshipRepository.findOne({ where: { godfatherId, godsonId } });
     }
 
-    async createSponsorship(godfatherId: number, godsonId: number, recipientId: number) {
+    async createSponsorship(godfatherId: number, godsonId: number, recipientId: number, emitterId: number) {
         let sponsorship;
         let godfather;
         let godson;
@@ -335,6 +335,7 @@ export class UserService {
         sponsorship.godfatherId = godfatherId;
         sponsorship.godsonId = godsonId;
         sponsorship.recipientId = recipientId;
+        sponsorship.emitterId = emitterId;
         sponsorship.date = new Date();
 
         return this.sponsorshipRepository.save(sponsorship);

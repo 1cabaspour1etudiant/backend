@@ -21,6 +21,8 @@ export class SponsorshipController {
         @Body() { godfatherId, godsonId }: CreateSponsorShipDto,
         @GetUser() user: User,
     ) {
+        let recipientId;
+        let emitterId;
         if (user.id != godfatherId && user.id != godsonId) {
             throw new ForbiddenException('Not allowed to create a sponsorship for someone else');
         }
@@ -29,7 +31,15 @@ export class SponsorshipController {
             throw new ForbiddenException('Not allowed to create a sponsorship for yourself');
         }
 
-        await this.userService.createSponsorship(godfatherId, godsonId, user.id === godfatherId ? godsonId : godfatherId);
+        if (user.id === godfatherId) {
+            recipientId = godsonId;
+            emitterId = godfatherId;
+        } else {
+            recipientId = godfatherId;
+            emitterId = godsonId;
+        }
+
+        await this.userService.createSponsorship(godfatherId, godsonId, recipientId, emitterId);
     }
 
     @ApiBearerAuth()
