@@ -18,6 +18,10 @@ export class Sponsorship {
     @OneToOne(() => User, (user) => user.id)
     recipientId: number;
 
+    @Column()
+    @OneToOne(() => User, (user) => user.id)
+    emitterId: number;
+
     @Column('boolean', { default: false })
     validated: boolean;
 
