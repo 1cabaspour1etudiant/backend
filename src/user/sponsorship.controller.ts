@@ -63,4 +63,11 @@ export class SponsorshipController {
     async deleteSponsorship(@GetUser() user: User, @Body() { sponsorshipId }: DeleteSponsorshipDto) {
         await this.userService.deleteSponsorship(user, sponsorshipId);
     }
+
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
+    @Get()
+    async getGodsonGodfather(@GetUser() user: User) {
+        return this.userService.getGodsonGodfather(user);
+    }
 }
