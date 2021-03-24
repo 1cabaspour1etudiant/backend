@@ -345,13 +345,37 @@ export class UserService {
         return this.sponsorshipRepository.save(sponsorship);
     }
 
-    async getAwatingSponsoshipRequests(user: User) {
-        return this.sponsorshipRepository.find({
-            where:[
-                { godfatherId: user.id, validated: false },
-                { godsonId: user.id, validated: false },
-            ]
-        });
+    async getAwatingSponsoshipRequests(user: User, type: string) {
+        const where = [];
+        if (type === 'received') {
+            where.push(
+                {
+                    godfatherId: user.id,
+                    validated: false,
+                    recipientId: user.id,
+                },
+                {
+                    godsonId: user.id,
+                    validated: false,
+                    recipientId: user.id,
+                },
+            );
+        } else {
+            where.push(
+                {
+                    godfatherId: user.id,
+                    validated: false,
+                    emitterId: user.id,
+                },
+                {
+                    godsonId: user.id,
+                    validated: false,
+                    emitterId: user.id,
+                },
+            );
+        }
+
+        return this.sponsorshipRepository.find({ where });
     }
 
     private async checkSponsorship(sponsorshipId: number) {

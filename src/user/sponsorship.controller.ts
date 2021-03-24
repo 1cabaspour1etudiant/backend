@@ -45,8 +45,8 @@ export class SponsorshipController {
     @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @Get('/requests')
-    async getAwatingSponsorshipRequests(@GetUser() user:User, @Query() { page, pageSize }: GetSponsorshipRequestsDto) {
-        const awaitingRequests = await this.userService.getAwatingSponsoshipRequests(user);
+    async getAwatingSponsorshipRequests(@GetUser() user:User, @Query() { page, pageSize, type }: GetSponsorshipRequestsDto) {
+        const awaitingRequests = await this.userService.getAwatingSponsoshipRequests(user, type);
         return this.userService.createPage(page, pageSize, awaitingRequests);
     }
 
