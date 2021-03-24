@@ -7,5 +7,5 @@ export abstract class GetUserByIdDto {
     @IsInt()
     @IsPositive()
     @Transform(({ value }) => parseInt(value))
-    id:number;
+    userId:number;
 }
