@@ -112,7 +112,7 @@ export class UserController {
     @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @Get()
-    async getUserInfos(@Query() { userId }: GetUserDto) {
-        return this.userService.getUserInfos(userId);
+    async getUserInfos(@GetUser() user:User, @Query() { userId }: GetUserDto) {
+        return this.userService.getUserInfos(user, userId);
     }
 }

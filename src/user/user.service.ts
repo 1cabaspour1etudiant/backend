@@ -427,11 +427,27 @@ export class UserService {
         };
     }
 
-    async getUserInfos(userId: number) {
-        const user = await this.userRespository.findOne({ where: { id: userId } });
-        if (!user) {
+    async getUserInfos(user: User, userId: number) {
+        const searchedUser = await this.userRespository.findOne({ where: { id: userId } });
+        if (!searchedUser) {
             throw new NotFoundException(`No user found for id ${userId}`);
         }
+
+        const origin = {
+            type: 'Point',
+            coordinates: [
+                user.address.longitude,
+                user.address.latitude
+            ],
+        };
+
+        const [ { distance } ]: { distance: number }[] = await this.userRespository
+            .query(`
+                SELECT ST_Distance(location, ST_SetSRID(ST_GeomFromGeoJSON($1), ST_SRID(location)), true) AS "distance"
+                FROM "user" "user"
+                INNER JOIN "address" "address" ON "user"."addressId"="address"."id"
+                WHERE "user"."id"=$2
+            `, [ JSON.stringify(origin), userId ]);
 
         const {
             password,
@@ -442,8 +458,10 @@ export class UserService {
             validated,
             email,
             lastname,
-            ...userInfos
-        } = user;
+            ...publicFields
+        } = searchedUser;
+
+        const userInfos = { ...publicFields, distance };
 
         return userInfos;
     }
