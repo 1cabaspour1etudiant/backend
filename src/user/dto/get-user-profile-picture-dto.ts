@@ -1,11 +1,3 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Transform } from "class-transformer";
-import { IsInt, IsPositive } from "class-validator";
+import { GetUserByIdDto } from "./abstract-get-user-by-id-dto";
 
-export class GetUserProfilePictureDto {
-    @ApiProperty()
-    @IsInt()
-    @IsPositive()
-    @Transform(({ value }) => parseInt(value))
-    id:number;
-}
+export class GetUserProfilePictureDto extends GetUserByIdDto {}
