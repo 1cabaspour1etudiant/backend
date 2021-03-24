@@ -395,6 +395,25 @@ export class UserService {
         return query;
     }
 
+    async getGodsonGodfather(user: User) {
+        const query = await this.sponsorshipRepository
+            .query(`
+                SELECT "user"."id" AS "id",
+                "user"."firstname" AS "firstname",
+                "user"."lastname" AS "lastname",
+                "user"."tel" AS "tel",
+                "address"."address" AS "address",
+                FROM "user" "user"
+                INNER JOIN "address" "address" ON "address"."id"="user"."addressId"
+                INNER JOIN "sponsorship" "sponsorship" ON "sponsorship"."godfatherId"="user"."id"
+                WHERE "sponsorship"."godsonId"=$1
+            `, [
+                user.id
+            ]);
+
+        return query;
+    }
+
     createPage<T>(page:number, pageSize: number, elements: T[]) {
         const start = pageSize * page;
         const end = start + pageSize;
