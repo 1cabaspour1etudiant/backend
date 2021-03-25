@@ -380,7 +380,7 @@ export class UserService {
 
     private async checkSponsorship(sponsorshipId: number) {
         const sponsorship = await this.sponsorshipRepository.findOne({ where: { sponsorshipId } });
-        if (!sponsorshipId) {
+        if (!sponsorship) {
             throw new NotFoundException(`Unknow sponsorship's id ${sponsorshipId}`);
         }
 
