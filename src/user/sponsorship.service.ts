@@ -145,7 +145,9 @@ export class SponsorshipService {
                 "user"."firstname" AS "firstname",
                 "user"."lastname" AS "lastname",
                 "user"."tel" AS "tel",
-                "address"."address" AS "address"
+                "address"."address" AS "address",
+                "sponsorship"."sponsorshipId" AS "sponsorshipId",
+                "sponsorship"."date" AS "sponsorshipDate"
                 FROM "user" "user"
                 INNER JOIN "address" "address" ON "address"."id"="user"."addressId"
                 INNER JOIN "sponsorship" "sponsorship" ON "sponsorship"."godfatherId"="user"."id"
