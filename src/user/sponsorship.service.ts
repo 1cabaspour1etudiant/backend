@@ -135,13 +135,17 @@ export class SponsorshipService {
     }
 
     async getGodsonGodfather(user: User) {
+        if (user.status !== 'godson') {
+            throw new ForbiddenException('Only a godson can have a godfather');
+        }
+
         const query = await this.sponsorshipRepository
             .query(`
-                SELECT "user"."id" AS "id",
+                SELECT "user"."id" AS "userId",
                 "user"."firstname" AS "firstname",
                 "user"."lastname" AS "lastname",
                 "user"."tel" AS "tel",
-                "address"."address" AS "address",
+                "address"."address" AS "address"
                 FROM "user" "user"
                 INNER JOIN "address" "address" ON "address"."id"="user"."addressId"
                 INNER JOIN "sponsorship" "sponsorship" ON "sponsorship"."godfatherId"="user"."id"
@@ -150,6 +154,11 @@ export class SponsorshipService {
                 user.id
             ]);
 
-        return query;
+        const [ godfather ] = await query;
+        if (!godfather) {
+            throw new NotFoundException('No godfather found');
+        }
+
+        return godfather;
     }
 }

@@ -70,7 +70,7 @@ export class SponsorshipController {
 
     @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
-    @Get()
+    @Get('godfather')
     async getGodsonGodfather(@GetUser() user: User) {
         return this.sponsorshipService.getGodsonGodfather(user);
     }
