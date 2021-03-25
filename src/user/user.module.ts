@@ -9,6 +9,7 @@ import { User } from './entities/user.entity';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { SponsorshipController } from './sponsorship.controller';
+import { SponsorshipService } from './sponsorship.service';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { SponsorshipController } from './sponsorship.controller';
     HttpModule,
   ],
   controllers: [UserController, SponsorshipController],
-  providers: [UserService],
+  providers: [UserService, SponsorshipService],
   exports: [UserService]
 })
 export class UserModule {}
