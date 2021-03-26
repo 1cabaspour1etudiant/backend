@@ -52,8 +52,11 @@ export class UserController {
     @UseGuards(AuthGuard('jwt'))
     @Get('/me')
     async getUserMeInfos(@GetUser() user: User) {
-        const { password, ...userDto } = user;
-        return userDto;
+        const { password, id:userId, ...userDto } = user;
+        return {
+            userId,
+            ...userDto,
+        };
     }
 
     @ApiBearerAuth()
