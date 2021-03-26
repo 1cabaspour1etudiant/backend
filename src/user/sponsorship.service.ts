@@ -118,11 +118,13 @@ export class SponsorshipService {
     async getGodfatherGodchildren(user: User) {
         const query = await this.sponsorshipRepository
             .query(`
-                SELECT "user"."id" AS "id",
+                SELECT "user"."id" AS "userId",
                 "user"."firstname" AS "firstname",
                 "user"."lastname" AS "lastname",
                 "user"."tel" AS "tel",
                 "address"."address" AS "address",
+                "sponsorship"."sponsorshipId" AS "sponsorshipId",
+                "sponsorship"."date" AS "sponsorshipDate"
                 FROM "user" "user"
                 INNER JOIN "address" "address" ON "address"."id"="user"."addressId"
                 INNER JOIN "sponsorship" "sponsorship" ON "sponsorship"."godsonId"="user"."id"
