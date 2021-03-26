@@ -5,6 +5,7 @@ import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { AcceptSponsorshipDto } from './dto/accept-sponsorship-dto';
 import { CreateSponsorShipDto } from './dto/create-sponsorship-dto';
 import { DeleteSponsorshipDto } from './dto/delete-sponsorship-dto';
+import { GetGodfatherGodChildren } from './dto/get-godfather-godchildren-dto';
 import { GetSponsorshipRequestsDto } from './dto/get-sponsorship-requests-dto';
 import { User } from './entities/user.entity';
 import { SponsorshipService } from './sponsorship.service';
@@ -73,5 +74,13 @@ export class SponsorshipController {
     @Get('godfather')
     async getGodsonGodfather(@GetUser() user: User) {
         return this.sponsorshipService.getGodsonGodfather(user);
+    }
+
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
+    @Get('godsons')
+    async getGodfatherGodChildren(@GetUser() user: User, @Query() { page, pageSize }: GetGodfatherGodChildren) {
+        const godChildren = await this.sponsorshipService.getGodfatherGodchildren(user);
+        return this.userService.createPage(page, pageSize, godChildren);
     }
 }
