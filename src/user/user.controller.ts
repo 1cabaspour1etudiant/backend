@@ -45,7 +45,12 @@ export class UserController {
     @Patch('/me')
     async updateUserMeInfos(@GetUser() user: User, @Body() updateUserDto: UpdateUserDto) {
         await this.userService.updateUser(user, updateUserDto);
-        return updateUserDto;
+        const userUpdated = await this.userService.getUserByEmail(user.email);
+        const { password, id:userId, ...userDto } = userUpdated;
+        return {
+            userId,
+            ...userDto,
+        };
     }
 
     @ApiBearerAuth()
