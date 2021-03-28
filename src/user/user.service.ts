@@ -180,10 +180,27 @@ export class UserService {
                 city: city || user.address.city,
                 zipCode: zipCode || user.address.zipCode,
             };
-            await this.addressRepository.update({ id: user.address.id }, addressProperties);
+
+            const { lat, lng } = await this.resolveAddress(
+                addressProperties.address,
+                addressProperties.city,
+                addressProperties.zipCode,
+            );
+
+            await this.addressRepository.update({ id: user.address.id }, {
+                ...addressProperties,
+                longitude: lng,
+                latitude: lat,
+                location: {
+                    type: 'Point',
+                    coordinates: [lng, lat],
+                }
+            });
         }
 
-        await this.userRespository.update({ id: user.id }, userProperties);
+        if (Object.keys(userProperties).length > 0) {
+            await this.userRespository.update({ id: user.id }, userProperties);
+        }
     }
 
     async emailIsAvailable(email: string) {
