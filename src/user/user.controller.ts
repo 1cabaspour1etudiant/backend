@@ -106,7 +106,9 @@ export class UserController {
     @Get('/search')
     async getClosestUsers(@GetUser() user:User, @Query() { page, pageSize }: SearchUserDto) {
         const closestUsers = await this.userService.getClosestUsers(user);
-        return this.userService.createPage<UserSearch>(page, pageSize, closestUsers);
+        const pageItems = this.userService.createPage<UserSearch>(page, pageSize, closestUsers);
+        pageItems.items = pageItems.items.map((item) => ({...item, contacted: item.sponsorshipId !== null}));
+        return pageItems;
     }
 
     @ApiBearerAuth()

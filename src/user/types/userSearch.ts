@@ -4,4 +4,6 @@ export interface UserSearch {
     activityArea: string,
     address: string,
     distance: number,
+    sponsorshipId: number,
+    contacted: boolean,
 }

@@ -308,8 +308,11 @@ export class UserService {
                 "user"."firstname" AS "firstname",
                 "user"."activityArea" AS "activityArea",
                 "address"."address" AS "address",
+                "sponsorship"."sponsorshipId" AS "sponsorshipId",
                 ST_Distance(location, ST_SetSRID(ST_GeomFromGeoJSON($1), ST_SRID(location)), true) AS "distance"
-                FROM "user" "user" INNER JOIN "address" "address" ON "address"."id"="user"."addressId"
+                FROM "user" "user"
+                INNER JOIN "address" "address" ON "address"."id"="user"."addressId"
+                LEFT JOIN "sponsorship" ON "sponsorship"."emitterId"="user"."id" OR "sponsorship"."recipientId"="user"."id"
                 WHERE "user"."id" != $2 AND "user"."status" != $3
                 ORDER BY distance ASC
             `, [
