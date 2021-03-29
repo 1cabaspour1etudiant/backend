@@ -366,4 +366,15 @@ export class UserService {
 
         return userInfos;
     }
+
+    async getUserMeHasGodfather(user: User) {
+        const [ sponsorshipId ] = await this.userRespository
+            .query(`
+                SELECT "sponsorship"."sponsorshipId" AS "sponsorshipId"
+                FROM "user" JOIN "sponsorship" ON "user"."id"="sponsorship"."godsonId"
+                WHERE "user"."id"=$1
+            `, [user.id]);
+
+        return sponsorshipId ? true : false;
+    }
 }

@@ -124,4 +124,11 @@ export class UserController {
     async getUserInfos(@GetUser() user:User, @Query() { userId }: GetUserDto) {
         return this.userService.getUserInfos(user, userId);
     }
+
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard('jwt'))
+    @Get('/me/hasgodfather')
+    async getUserMeHasGodfather(@GetUser() user:User) {
+        return this.userService.getUserMeHasGodfather(user);
+    }
 }
