@@ -172,6 +172,10 @@ export class UserService {
             updateUserDto.email = updateUserDto.email.toUpperCase();
         }
 
+        if (typeof updateUserDto.password === 'string') {
+            updateUserDto.password = await hash(updateUserDto.password, UserService.saltRounds);
+        }
+
         const { address, city, zipCode, ...userProperties } = updateUserDto;
 
         if (address || city || zipCode) {
