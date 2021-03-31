@@ -3,6 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/user/entities/user.entity';
 import { AuthService } from './auth.service';
 import { GetUser } from './decorators/get-user.decorator';
+import { RecoverPasswordDto } from './dto/recover-password-dto';
 import SendPasswordRecoveryCode from './dto/send-password-recovery-code-dto';
 import { JwtQueryGuard } from './guards/jwt-query.guard';
 
@@ -25,5 +26,10 @@ export class AuthController {
     @Post('/password/recoverycode')
     async sendPasswordRecoveryCode(@Body() sendRecoveryCodeDto: SendPasswordRecoveryCode) {
         await this.authService.sendPasswordRecoveryCode(sendRecoveryCodeDto);
+    }
+
+    @Post('/password/recover')
+    async recoverPassword(@Body() recoverPasswordDto: RecoverPasswordDto) {
+        await this.authService.recoverPassword(recoverPasswordDto);
     }
 }
