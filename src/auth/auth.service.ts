@@ -5,12 +5,20 @@ import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/entities/user.entity';
 import { TypeTokenDecoded } from './types/TypeTokenDecoded';
 import { TypeTokenPayload } from './types/TypeTokenPayload';
+import SendPasswordRecoveryCode from './dto/send-password-recovery-code-dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CodeForgottenPassword } from './entities/CodeForgottenPassword';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
+        private readonly mailerService: MailerService,
+        @InjectRepository(CodeForgottenPassword)
+        private readonly passwordRecoveryCodeEntity: Repository<CodeForgottenPassword>,
     ) {}
 
 
@@ -61,5 +69,30 @@ export class AuthService {
         }
 
         return this.userService.updateValidatedEmailStatus(user, true);
+    }
+
+    async sendPasswordRecoveryCode(sendPasswordRecoveryCode: SendPasswordRecoveryCode) {
+        const user = await this.userService.getUserByEmail(sendPasswordRecoveryCode.email);
+        if (user) {
+            const recoveryCode = this.passwordRecoveryCodeEntity.create();
+            recoveryCode.userId = user.id;
+            recoveryCode.timestamp = new Date();
+            recoveryCode.code = Math.floor(Math.random() * (10**5 - 10**4) + 10**4);
+            await this.passwordRecoveryCodeEntity.save(recoveryCode);
+
+            const emailOptions = {
+                to: user.email,
+                subject: 'Recovery code for update you password',
+                context: {
+                    firstname: user.firstname,
+                    lastname: user.lastname,
+                    email: user.email.toLowerCase(),
+                    code: recoveryCode.code
+                },
+                template: 'recovery-password',
+            };
+
+            await this.mailerService.sendMail(emailOptions);
+        }
     }
 }
