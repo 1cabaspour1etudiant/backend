@@ -1,5 +1,4 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class CodeForgottenPassword {
@@ -15,6 +14,6 @@ export class CodeForgottenPassword {
     @Column('boolean', { default: false })
     used: boolean;
 
-    @OneToOne(() => User)
-    user: User;
+    @Column('integer')
+    userId: number;
 }
