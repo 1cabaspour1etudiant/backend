@@ -8,8 +8,8 @@ export class CodeForgottenPassword {
     @Column('integer')
     code: number;
 
-    @Column('date')
-    date: Date;
+    @Column('timestamp with time zone')
+    timestamp: Date;
 
     @Column('boolean', { default: false })
     used: boolean;
