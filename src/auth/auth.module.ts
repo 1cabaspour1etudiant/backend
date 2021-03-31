@@ -6,6 +6,8 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { AuthController } from './auth.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { CodeForgottenPassword } from './entities/CodeForgottenPassword';
 
 @Module({
   imports: [
@@ -18,6 +20,7 @@ import { AuthController } from './auth.controller';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '365d' }
     }),
+    TypeOrmModule.forFeature([CodeForgottenPassword]),
   ],
   providers: [AuthService, JwtStrategy, LocalStrategy],
   controllers: [AuthController],
