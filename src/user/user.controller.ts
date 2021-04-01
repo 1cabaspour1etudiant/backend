@@ -25,6 +25,23 @@ export class UserController {
         private readonly authService: AuthService,
     ) {}
 
+    private formatUserInfos(user: User) {
+        const {
+            password,
+            id:userId,
+            pushToken,
+            profilePictureKey,
+            profilePictureValidated,
+            emailAdressValidated,
+            useEmailUppercase,
+            ...userDto
+        } = user;
+        return {
+            userId,
+            ...userDto,
+        };
+    }
+
     @Get('emailIsAvailable')
     async emailIsAvailable(@Query() emailIsAvailableDto: EmailIsAvailableDto) {
         return this.userService.emailIsAvailable(emailIsAvailableDto.email);
@@ -46,41 +63,14 @@ export class UserController {
     async updateUserMeInfos(@GetUser() user: User, @Body() updateUserDto: UpdateUserDto) {
         await this.userService.updateUser(user, updateUserDto);
         const userUpdated = await this.userService.getUserByEmail(user.email);
-        const {
-            password,
-            id:userId,
-            pushToken,
-            profilePictureKey,
-            profilePictureValidated,
-            emailAdressValidated,
-            useEmailUppercase,
-            ...userDto
-        } = userUpdated;
-        return {
-            userId,
-            ...userDto,
-        };
+        return this.formatUserInfos(userUpdated);
     }
 
     @ApiBearerAuth()
     @UseGuards(AuthGuard('jwt'))
     @Get('/me')
     async getUserMeInfos(@GetUser() user: User) {
-        const {
-            password,
-            id:userId,
-            pushToken,
-            profilePictureKey,
-            profilePictureValidated,
-            emailAdressValidated,
-            useEmailUppercase,
-            ...userDto
-        } = user;
-
-        return {
-            userId,
-            ...userDto,
-        };
+        return this.formatUserInfos(user);
     }
 
     @ApiBearerAuth()
