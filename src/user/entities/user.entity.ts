@@ -53,6 +53,9 @@ export class User {
     @Column('boolean', { default: false })
     profilePictureValidated: string;
 
+    @Column('varchar', { nullable: true })
+    pushToken: string;
+
     @BeforeInsert()
     useEmailUppercase() {
         this.email = this.email.toUpperCase();
