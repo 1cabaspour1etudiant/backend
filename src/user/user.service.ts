@@ -306,7 +306,6 @@ export class UserService {
             .query(`
                 SELECT DISTINCT ON (distance) "user"."id" AS "id",
                 "user"."firstname" AS "firstname",
-                "user"."activityArea" AS "activityArea",
                 "address"."address" AS "address",
                 "sponsorship"."sponsorshipId" AS "sponsorshipId",
                 ST_Distance(location, ST_SetSRID(ST_GeomFromGeoJSON($1), ST_SRID(location)), true) AS "distance"
