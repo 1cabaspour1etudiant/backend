@@ -46,7 +46,16 @@ export class UserController {
     async updateUserMeInfos(@GetUser() user: User, @Body() updateUserDto: UpdateUserDto) {
         await this.userService.updateUser(user, updateUserDto);
         const userUpdated = await this.userService.getUserByEmail(user.email);
-        const { password, id:userId, ...userDto } = userUpdated;
+        const {
+            password,
+            id:userId,
+            pushToken,
+            profilePictureKey,
+            profilePictureValidated,
+            emailAdressValidated,
+            useEmailUppercase,
+            ...userDto
+        } = userUpdated;
         return {
             userId,
             ...userDto,
