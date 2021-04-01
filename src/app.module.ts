@@ -34,6 +34,7 @@ import { AuthModule } from './auth/auth.module';
         GOOGLE_APPLICATION_CREDENTIALS: Joi.required(),
         GOOGLE_API_KEY: Joi.required(),
         PORT: Joi.number().required(),
+        EXPO_ACCESS_TOKEN: Joi.string().required(),
       }),
     }),
     UserModule,
