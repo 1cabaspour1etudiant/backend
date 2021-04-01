@@ -5,6 +5,11 @@ import { Sponsorship } from './entities/sponsorship.entity';
 import { User } from './entities/user.entity';
 import { Expo } from 'expo-server-sdk';
 
+enum NOTIFICATION_TYPES {
+    SPONSORSHIP_REQUEST = 'SPONSORSHIP_REQUEST',
+    SPONSORSHIP_ACCEPTED = 'SPONSORSHIP_ACCEPTED',
+};
+
 @Injectable()
 export class SponsorshipService {
     private expo:Expo;
@@ -84,9 +89,10 @@ export class SponsorshipService {
                 data: {
                     emitterId,
                     date: new Date(),
+                    type: NOTIFICATION_TYPES.SPONSORSHIP_REQUEST,
                 },
             }]);
-        }        
+        }
     }
 
     async getAwatingSponsoshipRequests(user: User, type: string) {
@@ -153,7 +159,11 @@ export class SponsorshipService {
             await this.expo.sendPushNotificationsAsync([{
                 to: emitter.pushToken,
                 body: sentence,
-                data: { emitterId: emitter.id, date: new Date() }
+                data: {
+                    emitterId: emitter.id,
+                    date: new Date(),
+                    type: NOTIFICATION_TYPES.SPONSORSHIP_ACCEPTED,
+                }
             }]);
         }
     }
