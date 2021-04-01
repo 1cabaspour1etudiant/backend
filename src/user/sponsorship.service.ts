@@ -132,12 +132,30 @@ export class SponsorshipService {
     }
 
     async acceptAwaitingSponsorshipRequest(user:User, sponsorshipId: number) {
+        let emitter: User;
         const sponsorship = await this.checkSponsorship(sponsorshipId);
         if (sponsorship.recipientId !== user.id) {
             throw new ForbiddenException('Not allowed to validate this sponsorship request');
         }
 
-        return this.sponsorshipRepository.update({ sponsorshipId }, { validated: true });
+        await this.sponsorshipRepository.update({ sponsorshipId }, { validated: true });
+
+        emitter = await this.userRespository.findOne(sponsorship.emitterId);
+        if (emitter && emitter.pushToken) {
+            let sentence:string;
+
+            if (emitter.status === 'godson') {
+                sentence = `${user.firstname} est maintenant votre parrain`;
+            } else {
+                sentence = `${user.firstname} est maintenant votre filleul`;
+            }
+
+            await this.expo.sendPushNotificationsAsync([{
+                to: emitter.pushToken,
+                body: sentence,
+                data: { emitterId: emitter.id, date: new Date() }
+            }]);
+        }
     }
 
     async deleteSponsorship(user: User, sponsorshipId: number) {
