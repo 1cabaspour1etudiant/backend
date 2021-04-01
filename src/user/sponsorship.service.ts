@@ -3,24 +3,31 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Sponsorship } from './entities/sponsorship.entity';
 import { User } from './entities/user.entity';
+import { Expo } from 'expo-server-sdk';
 
 @Injectable()
 export class SponsorshipService {
+    private expo:Expo;
+
     constructor(
         @InjectRepository(User)
         private readonly userRespository: Repository<User>,
         @InjectRepository(Sponsorship)
         private readonly sponsorshipRepository: Repository<Sponsorship>,
-    ) {}
+    ) {
+        this.expo = new Expo({ accessToken: process.env.EXPO_ACCESS_TOKEN });
+    }
 
     async getSponsorship(godfatherId: number, godsonId: number) {
         return this.sponsorshipRepository.findOne({ where: { godfatherId, godsonId } });
     }
 
     async createSponsorship(godfatherId: number, godsonId: number, recipientId: number, emitterId: number) {
-        let sponsorship;
-        let godfather;
-        let godson;
+        let sponsorship: Sponsorship;
+        let godfather: User;
+        let godson: User;
+        let recipient: User;
+        let emitter: User;
 
         godfather = await this.userRespository.findOne({ where: { id: godfatherId } });
         if (!godfather) {
@@ -40,6 +47,14 @@ export class SponsorshipService {
             throw new ForbiddenException(`Id ${godsonId} does not refer to a godson`);
         }
 
+        if (recipientId === godfatherId) {
+            recipient = godfather;
+            emitter = godson;
+        } else {
+            recipient = godson;
+            emitter = godfather;
+        }
+
         sponsorship = await this.getSponsorship(godfatherId, godsonId);
         if (sponsorship) {
             throw new ConflictException('Sponsorship already exist');
@@ -52,7 +67,26 @@ export class SponsorshipService {
         sponsorship.emitterId = emitterId;
         sponsorship.date = new Date();
 
-        return this.sponsorshipRepository.save(sponsorship);
+        await this.sponsorshipRepository.save(sponsorship);
+        if (recipient.pushToken) {
+            let sentence:string;
+
+            if (emitter.status === 'godson') {
+                sentence = `${emitter.firstname} vous propose d'être son parrain`;
+            } else {
+                sentence = `${emitter.firstname} vous propose d'être votre parrain`;
+            }
+
+            await this.expo.sendPushNotificationsAsync([{
+                to: recipient.pushToken,
+                sound: 'default',
+                body: sentence,
+                data: {
+                    emitterId,
+                    date: new Date(),
+                },
+            }]);
+        }        
     }
 
     async getAwatingSponsoshipRequests(user: User, type: string) {
