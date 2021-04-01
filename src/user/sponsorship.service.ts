@@ -190,7 +190,7 @@ export class SponsorshipService {
                 FROM "user" "user"
                 INNER JOIN "address" "address" ON "address"."id"="user"."addressId"
                 INNER JOIN "sponsorship" "sponsorship" ON "sponsorship"."godsonId"="user"."id"
-                WHERE "sponsorship"."godfatherId"=$1
+                WHERE "sponsorship"."godfatherId"=$1 AND "sponsorship"."validated"=true
             `, [
                 user.id
             ]);
