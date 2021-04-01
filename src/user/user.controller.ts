@@ -66,7 +66,17 @@ export class UserController {
     @UseGuards(AuthGuard('jwt'))
     @Get('/me')
     async getUserMeInfos(@GetUser() user: User) {
-        const { password, id:userId, ...userDto } = user;
+        const {
+            password,
+            id:userId,
+            pushToken,
+            profilePictureKey,
+            profilePictureValidated,
+            emailAdressValidated,
+            useEmailUppercase,
+            ...userDto
+        } = user;
+
         return {
             userId,
             ...userDto,
