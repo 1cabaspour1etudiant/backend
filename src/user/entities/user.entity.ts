@@ -38,9 +38,6 @@ export class User {
     })
     status: string;
 
-    @Column()
-    activityArea: string;
-
     @Column('boolean', { default: false })
     emailAdressValidated: boolean;
 
