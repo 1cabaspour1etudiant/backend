@@ -1,5 +1,6 @@
-import { IsEmail, IsString, Length } from 'class-validator';
+import { IsEmail, IsString, Length, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { UserStatus } from '../entities/user.entity';
 
 export class CreateUserDto {
     @ApiProperty()
@@ -38,5 +39,6 @@ export class CreateUserDto {
 
     @ApiProperty()
     @IsString()
+    @IsEnum(UserStatus)
     status:string;
 }
